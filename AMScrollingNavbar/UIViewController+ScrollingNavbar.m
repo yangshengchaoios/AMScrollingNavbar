@@ -249,6 +249,33 @@
 	}
 }
 
+- (void)checkForPartialScroll {
+	CGFloat pos = self.navigationController.navigationBar.frame.origin.y;
+	__block CGRect frame = self.navigationController.navigationBar.frame;
+    
+	// Get back down
+	if (pos >= ([self statusBarHeight] - frame.size.height / 2)) {
+        self.isNavBarHidden = NO;
+		CGFloat delta = frame.origin.y - [self statusBarHeight];
+		NSTimeInterval duration = ABS((delta / (frame.size.height / 2)) * 0.2);
+		[UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations: ^{
+		    frame.origin.y = [self statusBarHeight];
+		    self.navigationController.navigationBar.frame = frame;
+		    [self updateSizingWithDelta:delta];
+		} completion:nil];
+	}
+	else {// And back up
+        self.isNavBarHidden = YES;
+		CGFloat delta = frame.origin.y + [self deltaLimit];
+		NSTimeInterval duration = ABS((delta / (frame.size.height / 2)) * 0.2);
+		[UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations: ^{
+		    frame.origin.y = -[self deltaLimit];
+		    self.navigationController.navigationBar.frame = frame;
+		    [self updateSizingWithDelta:delta];
+		} completion:nil];
+	}
+}
+
 /**
  *  Prevents the navbar from moving during the 'rubberband' scroll
  *
@@ -316,33 +343,6 @@
 		}
         
 		[self updateSizingWithDelta:delta];
-	}
-}
-
-- (void)checkForPartialScroll {
-	CGFloat pos = self.navigationController.navigationBar.frame.origin.y;
-	__block CGRect frame = self.navigationController.navigationBar.frame;
-    
-	// Get back down
-	if (pos >= ([self statusBarHeight] - frame.size.height / 2)) {
-        self.isNavBarHidden = NO;
-		CGFloat delta = frame.origin.y - [self statusBarHeight];
-		NSTimeInterval duration = ABS((delta / (frame.size.height / 2)) * 0.2);
-		[UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations: ^{
-		    frame.origin.y = [self statusBarHeight];
-		    self.navigationController.navigationBar.frame = frame;
-		    [self updateSizingWithDelta:delta];
-		} completion:nil];
-	}
-	else {// And back up
-        self.isNavBarHidden = YES;
-		CGFloat delta = frame.origin.y + [self deltaLimit];
-		NSTimeInterval duration = ABS((delta / (frame.size.height / 2)) * 0.2);
-		[UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations: ^{
-		    frame.origin.y = -[self deltaLimit];
-		    self.navigationController.navigationBar.frame = frame;
-		    [self updateSizingWithDelta:delta];
-		} completion:nil];
 	}
 }
 
